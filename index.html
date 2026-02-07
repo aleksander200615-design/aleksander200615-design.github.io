@@ -1,37 +1,27 @@
 <!DOCTYPE html>
-<html lang="ru">
+<html>
 <head>
   <meta charset="UTF-8">
-  <title>WebGazer работает</title>
+  <title>WebGazer Test</title>
 
-  <script src="https://cdn.jsdelivr.net/npm/webgazer@2.1.0/webgazer.min.js"></script>
+  <script src="https://webgazer.cs.brown.edu/webgazer.js"></script>
 </head>
 
 <body>
-  <h2>WebGazer тест</h2>
-  <p>Разреши доступ к камере и смотри в экран</p>
+  <h2>WebGazer test</h2>
+  <p>Нажми кнопку и смотри на экран</p>
+
+  <button onclick="start()">START</button>
 
   <script>
-    async function start() {
-      await webgazer
+    function start() {
+      webgazer
         .setRegression('ridge')
-        .setGazeListener(function(data, elapsedTime) {
-          if (data) {
-            console.log(
-              "x:", Math.round(data.x),
-              "y:", Math.round(data.y)
-            );
-          }
-        })
         .showVideo(true)
         .showFaceOverlay(true)
-        .showFaceFeedbackBox(true)
+        .showPredictionPoints(true)
         .begin();
-
-      alert("WebGazer запущен");
     }
-
-    start();
   </script>
 </body>
 </html>
