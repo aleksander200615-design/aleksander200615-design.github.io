@@ -1,2 +1,37 @@
-хуй счяука
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <title>WebGazer работает</title>
 
+  <script src="https://cdn.jsdelivr.net/npm/webgazer@2.1.0/webgazer.min.js"></script>
+</head>
+
+<body>
+  <h2>WebGazer тест</h2>
+  <p>Разреши доступ к камере и смотри в экран</p>
+
+  <script>
+    async function start() {
+      await webgazer
+        .setRegression('ridge')
+        .setGazeListener(function(data, elapsedTime) {
+          if (data) {
+            console.log(
+              "x:", Math.round(data.x),
+              "y:", Math.round(data.y)
+            );
+          }
+        })
+        .showVideo(true)
+        .showFaceOverlay(true)
+        .showFaceFeedbackBox(true)
+        .begin();
+
+      alert("WebGazer запущен");
+    }
+
+    start();
+  </script>
+</body>
+</html>
