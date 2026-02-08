@@ -1,44 +1,77 @@
 <!DOCTYPE html>
-<html>
+<html lang="ru">
 <head>
   <meta charset="UTF-8">
-  <title>WebGazer Working</title>
+  <title>WebGazer Experiment</title>
+
+  <!-- WebGazer -->
+  <script src="https://webgazer.cs.brown.edu/webgazer.js"></script>
 
   <style>
+    body {
+      margin: 0;
+      overflow: hidden;
+      background: #f5f5f5;
+    }
+
     #dot {
       position: fixed;
-      width: 20px;
-      height: 20px;
+      width: 18px;
+      height: 18px;
       background: red;
       border-radius: 50%;
       pointer-events: none;
       z-index: 9999;
       display: none;
     }
+
+    #info {
+      position: fixed;
+      top: 10px;
+      left: 10px;
+      background: white;
+      padding: 8px;
+      font-size: 14px;
+      z-index: 10000;
+    }
   </style>
 </head>
 
 <body>
-  <h2>WebGazer test</h2>
-  <button onclick="start()">START</button>
+
+  <div id="info">
+    Кликайте по экрану, глядя на курсор (калибровка)
+  </div>
 
   <div id="dot"></div>
-  <script src="https://webgazer.cs.brown.edu/webgazer.js"></script>
+
   <script>
-    function start() {
-      webgazer
-          .setGazeListener(function(data, elapsedTime) {
-              if (data) {
-                  const dot = document.getElementById('dot');
-                  dot.style.left = data.x + 'px';
-                  dot.style.top = data.y + 'px';
-                  dot.style.display = 'block';
-              }
-          })
-          .setRegression('ridge')
-          .showVideo(true)
-          .begin();
-    }
+    let calibratedPoints = 0;
+
+    // Считаем клики для калибровки
+    document.addEventListener('click', () => {
+      calibratedPoints++;
+      if (calibratedPoints === 20) {
+        document.getElementById('info').innerText =
+          'Калибровка выполнена. Просто смотрите на экран.';
+      }
+    });
+
+    webgazer
+      .setRegression('ridge')
+      .setGazeListener((data, elapsedTime) => {
+        if (data) {
+          const dot = document.getElementById('dot');
+          dot.style.left = data.x + 'px';
+          dot.style.top = data.y + 'px';
+          dot.style.display = 'block';
+        }
+      })
+      .showVideo(true)
+      .showFaceOverlay(true)
+      .showFaceFeedbackBox(true)
+      .begin();
   </script>
+
 </body>
 </html>
