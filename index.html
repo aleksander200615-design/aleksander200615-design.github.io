@@ -2,24 +2,42 @@
 <html>
 <head>
   <meta charset="UTF-8">
-  <title>WebGazer Test</title>
-
+  <title>WebGazer Working</title>
   <script src="https://webgazer.cs.brown.edu/webgazer.js"></script>
+
+  <style>
+    #dot {
+      position: fixed;
+      width: 20px;
+      height: 20px;
+      background: red;
+      border-radius: 50%;
+      pointer-events: none;
+      z-index: 9999;
+      display: none;
+    }
+  </style>
 </head>
 
 <body>
   <h2>WebGazer test</h2>
-  <p>Нажми кнопку и смотри на экран</p>
-
   <button onclick="start()">START</button>
+
+  <div id="dot"></div>
 
   <script>
     function start() {
       webgazer
         .setRegression('ridge')
+        .setGazeListener(function(data, elapsedTime) {
+          if (data) {
+            const dot = document.getElementById('dot');
+            dot.style.left = data.x + 'px';
+            dot.style.top = data.y + 'px';
+            dot.style.display = 'block';
+          }
+        })
         .showVideo(true)
-        .showFaceOverlay(true)
-        .showPredictionPoints(true)
         .begin();
     }
   </script>
