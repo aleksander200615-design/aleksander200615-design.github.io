@@ -1,77 +1,78 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
-  <meta charset="UTF-8">
-  <title>WebGazer Experiment</title>
-
-  <!-- WebGazer -->
-  <script src="https://webgazer.cs.brown.edu/webgazer.js"></script>
-
-  <style>
-    body {
-      margin: 0;
-      overflow: hidden;
-      background: #f5f5f5;
-    }
-
-    #dot {
-      position: fixed;
-      width: 18px;
-      height: 18px;
-      background: red;
-      border-radius: 50%;
-      pointer-events: none;
-      z-index: 9999;
-      display: none;
-    }
-
-    #info {
-      position: fixed;
-      top: 10px;
-      left: 10px;
-      background: white;
-      padding: 8px;
-      font-size: 14px;
-      z-index: 10000;
-    }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WebGazer для физиологии</title>
+    <script src="https://cdn.jsdelivr.net/npm/webgazer@3/dist/webgazer.js"></script>[web:11]
+    <style>
+        body { font-family: Arial; text-align: center; }
+        #status { margin: 20px; font-size: 18px; }
+        button { padding: 10px 20px; font-size: 16px; margin: 10px; }
+        canvas { position: fixed; top: 0; left: 0; pointer-events: none; }
+    </style>
 </head>
-
 <body>
+    <h1>Проект по физиологии: Трекинг взгляда</h1>
+    <div id="status">Статус: Готов к запуску. Нажми "Запустить"</div>
+    <br>
+    <button onclick="startWebGazer()">Запустить WebGazer</button>
+    <button onclick="pauseWebGazer()">Пауза</button>
+    <button onclick="resumeWebGazer()">Продолжить</button>
+    <button onclick="endWebGazer()">Остановить</button>
+    <br><br>
+    <p>Кликай по экрану для калибровки (смотри на курсор). Данные взгляда в консоли (F12).</p>
 
-  <div id="info">
-    Кликайте по экрану, глядя на курсор (калибровка)
-  </div>
+    <script>
+        let isReady = false;
 
-  <div id="dot"></div>
-
-  <script>
-    let calibratedPoints = 0;
-
-    // Считаем клики для калибровки
-    document.addEventListener('click', () => {
-      calibratedPoints++;
-      if (calibratedPoints === 20) {
-        document.getElementById('info').innerText =
-          'Калибровка выполнена. Просто смотрите на экран.';
-      }
-    });
-
-    webgazer
-      .setRegression('ridge')
-      .setGazeListener((data, elapsedTime) => {
-        if (data) {
-          const dot = document.getElementById('dot');
-          dot.style.left = data.x + 'px';
-          dot.style.top = data.y + 'px';
-          dot.style.display = 'block';
+        function showStatus(msg) {
+            document.getElementById('status').innerHTML = `Статус: ${msg}`;
         }
-      })
-      .showVideo(true)
-      .showFaceOverlay(true)
-      .showFaceFeedbackBox(true)
-      .begin();
-  </script>
 
+        function startWebGazer() {
+            showStatus('Запуск... Разреши доступ к камере и кликай для калибровки');
+            webgazer.setGazeListener(function(data, timestamp) {
+                if (data == null) return;
+                const x = data.x;
+                const y = data.y;
+                console.log(`Взгляд: x=${Math.round(x)}, y=${Math.round(y)}, время=${timestamp}`);
+                // Здесь добавь код для записи данных в файл/сервер для физиологии
+            }).begin()
+            .then(() => {
+                showStatus('Работает! Кликай для калибровки.');
+                isReady = true;
+            })
+            .catch(err => {
+                showStatus('Ошибка: ' + err);
+                console.error(err);
+            });
+            
+            webgazer.showPredictionPoints(true); // Показывает точки предсказания
+        }
+
+        function pauseWebGazer() {
+            webgazer.pause();
+            showStatus('На паузе');
+        }
+
+        function resumeWebGazer() {
+            webgazer.resume();
+            showStatus('Продолжено');
+        }
+
+        function endWebGazer() {
+            webgazer.end();
+            showStatus('Остановлено');
+            isReady = false;
+        }
+
+        // Проверка готовности
+        setInterval(() => {
+            if (webgazer.isReady() && !isReady) {
+                showStatus('Готов! Данные в консоли.');
+            }
+        }, 1000);
+    </script>
 </body>
 </html>
