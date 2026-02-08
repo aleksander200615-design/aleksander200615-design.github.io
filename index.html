@@ -3,7 +3,6 @@
 <head>
   <meta charset="UTF-8">
   <title>WebGazer Working</title>
-  <script src="https://webgazer.cs.brown.edu/webgazer.js"></script>
 
   <style>
     #dot {
@@ -24,21 +23,21 @@
   <button onclick="start()">START</button>
 
   <div id="dot"></div>
-
+  <script src="https://webgazer.cs.brown.edu/webgazer.js"></script>
   <script>
     function start() {
       webgazer
-        .setRegression('ridge')
-        .setGazeListener(function(data, elapsedTime) {
-          if (data) {
-            const dot = document.getElementById('dot');
-            dot.style.left = data.x + 'px';
-            dot.style.top = data.y + 'px';
-            dot.style.display = 'block';
-          }
-        })
-        .showVideo(true)
-        .begin();
+          .setGazeListener(function(data, elapsedTime) {
+              if (data) {
+                  const dot = document.getElementById('dot');
+                  dot.style.left = data.x + 'px';
+                  dot.style.top = data.y + 'px';
+                  dot.style.display = 'block';
+              }
+          })
+          .setRegression('ridge')
+          .showVideo(true)
+          .begin();
     }
   </script>
 </body>
