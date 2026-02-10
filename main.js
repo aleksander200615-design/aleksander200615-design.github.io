@@ -1,3 +1,5 @@
+window.saveDataAcrossSessions = true;
+
 let isReady = false;
 
 function showStatus(msg) {
@@ -6,13 +8,13 @@ function showStatus(msg) {
 
 function startWebGazer() {
     showStatus('Запуск... Разреши доступ к камере и кликай для калибровки');
-    webgazer.setGazeListener(function(data, timestamp) {
-        if (data == null) return;
-        const x = data.x;
-        const y = data.y;
-        console.log(`Взгляд: x=${Math.round(x)}, y=${Math.round(y)}, время=${timestamp}`);
-        // Здесь добавь код для записи данных в файл/сервер для физиологии
-    }).begin()
+    webgazer
+        .setRegression('ridge')
+        .setGazeListener(handleWebGazerCoordinates)
+        .showVideoPreview(true)
+        .showPredictionPoints(true)
+        .applyKalmanFilter(true)
+        .begin()
         .then(() => {
             showStatus('Работает! Кликай для калибровки.');
             isReady = true;
@@ -21,8 +23,6 @@ function startWebGazer() {
             showStatus('Ошибка: ' + err);
             console.error(err);
         });
-
-    webgazer.showPredictionPoints(true); // Показывает точки предсказания
 }
 
 function pauseWebGazer() {
@@ -41,9 +41,13 @@ function endWebGazer() {
     isReady = false;
 }
 
-// Проверка готовности
-setInterval(() => {
-    if (webgazer.isReady() && !isReady) {
-        showStatus('Готов! Данные в консоли.');
-    }
-}, 1000);
+function handleWebGazerCoordinates(data, timestamp) {
+    if (data == null) return;
+    const x = data.x;
+    const y = data.y;
+    console.log(`Взгляд: x=${Math.round(x)}, y=${Math.round(y)}, время=${timestamp}`);
+}
+
+window.onbeforeunload = function() {
+    webgazer.end();
+}
