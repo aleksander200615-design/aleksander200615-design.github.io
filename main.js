@@ -28,6 +28,7 @@ function startWebGazer() {
     document.getElementById("hide").disabled = false;
     document.getElementById("show").disabled = true;
     document.getElementById("end").disabled = false;
+    initCaptureAreas();
 }
 
 function pauseWebGazer() {
@@ -59,11 +60,16 @@ function resetWebGazer() {
     webgazer.clearData();
 }
 
+var lastCheck = 0.0;
+
 function handleWebGazerCoordinates(data, timestamp) {
     if (data == null) return;
-    const x = data.x;
-    const y = data.y;
-    console.log(`Взгляд: x=${Math.round(x)}, y=${Math.round(y)}, время=${timestamp}`);
+    let timeDelta = (timestamp - lastCheck)/1000;
+    lastCheck = timestamp;
+    let x = data.x;
+    let y = data.y;
+    //console.log(`Взгляд: x=${Math.round(x)}, y=${Math.round(y)}, время=${timestamp}`);
+    checkCaptureAreas(x, y, timeDelta);
 }
 
 function hideVideo() {

@@ -10,6 +10,10 @@
         #status { margin: 8px; font-size: 18px; }
         button { padding: 4px 8px; font-size: 14px; margin: 4px; }
         canvas { position: fixed; top: 0; left: 0; pointer-events: none; }
+        .capture-area {
+            border: solid 2px black;
+            background-color: skyblue;
+        }
     </style>
 </head>
 <body style="margin: 0; padding: 0;">
@@ -26,6 +30,8 @@
         </div>
         <button id="reset" onclick="resetWebGazer()">Сбросить</button>
     </div>
+    <div class="capture-area"  id="ca0" style="position: absolute; left: 500px; top: 200px; width: 150px; height: 150px">0</div>
     <script src="main.js"></script>
+    <script src="capture-areas.js"></script>
 </body>
 </html>
