@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Фиксации внимания: Эксперимент</title>
+    <script src="https://cdn.jsdelivr.net/npm/webgazer@3/dist/webgazer.js"></script>
+    <style>
+        body { font-family: Arial; text-align: center; background: #f0f8ff; }
+        #game { max-width: 900px; margin: auto; }
+        #stimulus { width: 800px; height: 600px; margin: 20px auto; border: 3px solid #333; 
+                    position: relative; background: #ddd; }
+        #overlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; 
+                   pointer-events: none; opacity: 0.3; }
+        .zone { position: absolute; border: 2px dashed transparent; }
+        button { padding: 15px 30px; font-size: 18px; margin: 10px; 
+                 background: #4CAF50; color: white; border: none; border-radius: 5px; cursor: pointer; }
+        button:disabled { background: #ccc; }
+        #score, #timer { font-size: 24px; font-weight: bold; color: #2196F3; }
+        #results { margin-top: 30px; padding: 20px; background: white; border-radius: 10px; }
+    </style>
+</head>
+<body>
+    <div id="game">
+        <h1>🧠 Исследование фиксаций внимания</h1>
+        
+        <!-- ЭТАП 1: НАЧАЛО -->
+        <div id="start">
+            <p>Смотри на стимулы 10 секунд каждый. Очки за точные фиксации!</p>
+            <button onclick="startExperiment()">🚀 Начать эксперимент</button>
+        </div>
+
+        <!-- ЭТАП 2: СТИМУЛЫ -->
+        <div id="stimulusPhase" style="display:none;">
+            <div id="stimulus">
+                <canvas id="overlay" width="800" height="600"></canvas>
+            </div>
+            <p id="timer">10 сек</p>
+            <p id="score">Очки: 0</p>
+            <button id="nextBtn" onclick="nextStimulus()" disabled>Далее</button>
+        </div>
+
+        <!-- ЭТАП 3: РЕЗУЛЬТАТЫ -->
+        <div id="resultsPhase" style="display:none;">
+            <h2>✅ Эксперимент завершен!</h2>
+            <div id="finalScore"></div>
+            <canvas id="heatmap" width="800" height="600"></canvas>
+            <div id="interpretation"></div>
+            <a id="downloadBtn" style="display:none;"><button>📥 Скачать CSV</button></a>
+        </div>
+    </div>
+
+    <script>
+        // НАСТРОЙКИ
+        const STIMULI = [
+            'stimuli/scene_nature.jpg',
+            'stimuli/face_emotion.jpg',
+            'stimuli/abstract_colors.jpg',
+            'stimuli/ad_poster.jpg',
+            'stimuli/symmetric.jpg',
+            'stimuli/food_tools.jpg'
+        ];
+        const ZONES = [ // Координаты зон (x,y,width,height,очки)
+            {x:350,y:250,w:100,h:100,score:10}, // Центр
+            {x:300,y:200,w:80,h:80,score:15},  // Лицо зона
+            {x:100,y:100,w:150,h:150,score:5}  // Яркий объект
+        ];
+        
+        let currentStim = 0;
+        let fixations = [];
+        let totalScore = 0;
+        let timer = 10;
+        let gameTimer;
+        let csvData = "Stimulus,Fixation,X,Y,Time,Score\n";
+
+        // WebGazer
+        webgazer.setGazeListener(onGaze).begin();
+
+        function startExperiment() {
+            document.getElementById('start').style.display = 'none';
+            document.getElementById('stimulusPhase').style.display = 'block';
+            showStimulus(0);
+        }
+
+        function showStimulus(index) {
+            currentStim = index;
+            document.getElementById('stimulus').innerHTML = 
+                `<img src="${STIMULI[index]}" style="width:100%;height:100%;object-fit:cover;">
+                 <canvas id="overlay" width="800" height="600"></canvas>`;
+            fixations = []; // Очистка фиксаций
+            timer = 10;
+            document.getElementById('score').innerText = 'Очки: 0';
+            gameTimer = setInterval(countdown, 1000);
+            drawZones();
+        }
+
+        function countdown() {
+            timer--;
+            document.getElementById('timer').innerText = `${timer} сек`;
+            if (timer <= 0) {
+                clearInterval(gameTimer);
+                document.getElementById('nextBtn').disabled = false;
+            }
+        }
+
+        function nextStimulus() {
+            clearInterval(gameTimer);
+            document.getElementById('nextBtn').disabled = true;
+            
+            // Расчет очков для стимула
+            let stimScore = calculateScore();
+            totalScore += stimScore;
+            
+            // Запись CSV
+            fixations.forEach(f => {
+                csvData += `${currentStim},${f.fix},${f.x},${f.y},${f.t},${f.score}\n`;
+            });
+            
+            if (currentStim < STIMULI.length - 1) {
+                showStimulus(currentStim + 1);
+            } else {
+                showResults();
+            }
+        }
+
+        function onGaze(data) {
+            if (!data || timer <= 0) return;
+            if (fixations.length < 10) { // Первые 10 фиксаций
+                let score = getZoneScore(data.x, data.y);
+                fixations.push({
+                    fix: fixations.length + 1,
+                    x: Math.round(data.x),
+                    y: Math.round(data.y),
+                    t: Date.now(),
+                    score: score
+                });
+                document.getElementById('score').innerText = `Очки: ${fixations.reduce((a,b)=>a+b.score,0)}`;
+            }
+        }
+
+        function getZoneScore(x, y) {
+            for (let zone of ZONES) {
+                if (x > zone.x && x < zone.x + zone.w && y > zone.y && y < zone.y + zone.h) {
+                    return zone.score;
+                }
+            }
+            return 0;
+        }
+
+        function calculateScore() {
+            return fixations.reduce((sum, f) => sum + f.score, 0);
+        }
+
+        function drawZones() {
+            const canvas = document.getElementById('overlay');
+            const ctx = canvas.getContext('2d');
+            ctx.clearRect(0, 0, 800, 600);
+            ZONES.forEach(zone => {
+                ctx.strokeStyle = '#00FF00';
+                ctx.lineWidth = 2;
+                ctx.strokeRect(zone.x, zone.y, zone.w, zone.h);
+            });
+        }
+
+        function showResults() {
+            document.getElementById('stimulusPhase').style.display = 'none';
+            document.getElementById('resultsPhase').style.display = 'block';
+            
+            document.getElementById('finalScore').innerHTML = 
+                `<h3>🎉 Итого очков: ${totalScore}</h3>
+                 <p>Средние фиксации: ${Math.round(fixations.length / STIMULI.length)} на стимул</p>`;
+            
+            // Heatmap
+            drawHeatmap();
+            
+            // Интерпретация
+            let interp = interpretResults();
+            document.getElementById('interpretation').innerHTML = interp;
+            
+            // Скачать CSV
+            document.getElementById('downloadBtn').href = 'data:text/csv;charset=utf-8,' + encodeURIComponent(csvData);
+            document.getElementById('downloadBtn').download = 'fixations.csv';
+            document.getElementById('downloadBtn').style.display = 'inline';
+        }
+
+        function drawHeatmap() {
+            const canvas = document.getElementById('heatmap');
+            const ctx = canvas.getContext('2d');
+            const img = new Image();
+            img.src = STIMULI[currentStim]; // Последний стимул
+            img.onload = () => {
+                ctx.drawImage(img, 0, 0, 800, 600);
+                // Heatmap эффект
+                fixations.forEach(f => {
+                    let grad = ctx.createRadialGradient(f.x, f.y, 0, f.x, f.y, 50);
+                    grad.addColorStop(0, 'rgba(255,0,0,0.8)');
+                    grad.addColorStop(1, 'rgba(255,0,0,0)');
+                    ctx.fillStyle = grad;
+                    ctx.fillRect(f.x-50, f.y-50, 100, 100);
+                });
+            };
+        }
+
+        function interpretResults() {
+            let centerFix = fixations.filter(f => f.score >= 10).length;
+            let bioFix = fixations.filter(f => f.score == 15).length;
+            
+            return `
+                <h4>🧬 Интерпретация для физиологии:</h4>
+                <ul>
+                    <li><b>Центральное внимание:</b> ${Math.round(centerFix/fixations.length*100)}% фиксаций в центре (норма 65-75%)</li>
+                    <li><b>Биологическая значимость:</b> ${bioFix} фиксаций на лицах/еде</li>
+                    <li><b>Общая активность:</b> ${totalScore} очков (${totalScore > 100 ? 'Высокая концентрация' : 'Низкая'} внимания)</li>
+                </ul>
+                <p><i>Данные готовы для SPSS/R анализа!</i></p>
+            `;
+        }
+    </script>
+</body>
+</html>
