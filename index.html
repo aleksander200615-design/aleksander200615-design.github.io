@@ -4,25 +4,28 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>WebGazer для физиологии</title>
-    <script src="https://cdn.jsdelivr.net/npm/webgazer@3/dist/webgazer.js"></script>[web:11]
+    <script src="https://cdn.jsdelivr.net/npm/webgazer@3/dist/webgazer.js"></script>
     <style>
         body { font-family: Arial, sans-serif; text-align: center; }
-        #status { margin: 20px; font-size: 18px; }
-        button { padding: 10px 20px; font-size: 16px; margin: 10px; }
+        #status { margin: 8px; font-size: 18px; }
+        button { padding: 4px 8px; font-size: 14px; margin: 4px; }
         canvas { position: fixed; top: 0; left: 0; pointer-events: none; }
     </style>
 </head>
-<body>
-    <h1>Проект по физиологии: Трекинг взгляда</h1>
-    <div id="status">Статус: Готов к запуску. Нажми "Запустить"</div>
-    <br>
-    <button onclick="startWebGazer()">Запустить WebGazer</button>
-    <button onclick="pauseWebGazer()">Пауза</button>
-    <button onclick="resumeWebGazer()">Продолжить</button>
-    <button onclick="endWebGazer()">Остановить</button>
-    <br><br>
-    <p>Кликай по экрану для калибровки (смотри на курсор). Данные взгляда в консоли (F12).</p>
-
+<body style="margin: 0; padding: 0;">
+    <div style="display: flex; align-items: center; border-bottom: solid 1px black; padding: 8px">
+        <h3>Проект по физиологии: Трекинг взгляда</h3>
+        <div id="status" style="flex-grow: 1">Статус: Готов к запуску. Нажми "Запустить"</div>
+        <button id="start" onclick="startWebGazer()">Запустить WebGazer</button>
+        <button id="pause" onclick="pauseWebGazer()" disabled>Пауза</button>
+        <button id="resume" onclick="resumeWebGazer()" disabled>Продолжить</button>
+        <button id="end" onclick="endWebGazer()" disabled>Остановить</button>
+        <div style="display: flex; flex-direction: column">
+            <button id="hide" onclick="hideVideo()" disabled>Спрятать видео</button>
+            <button id="show" onclick="showVideo()" disabled>Показать видео</button>
+        </div>
+        <button id="reset" onclick="resetWebGazer()">Сбросить</button>
+    </div>
     <script src="main.js"></script>
 </body>
 </html>
