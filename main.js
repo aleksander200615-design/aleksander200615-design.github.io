@@ -24,11 +24,14 @@ function startWebGazer() {
             console.error(err);
         });
     document.getElementById("start").disabled = true;
-    document.getElementById("pause").disabled = false;
-    document.getElementById("hide").disabled = false;
-    document.getElementById("show").disabled = true;
-    document.getElementById("end").disabled = false;
-    initCaptureAreas();
+    waitFor(webgazer.isReady).then(()=>{
+        document.getElementById("pause").disabled = false;
+        document.getElementById("hide").disabled = false;
+        document.getElementById("show").disabled = true;
+        document.getElementById("end").disabled = false;
+        initCaptureAreas();
+        initializeCalibrationDots();
+    });
 }
 
 function pauseWebGazer() {
@@ -48,6 +51,7 @@ function resumeWebGazer() {
 function endWebGazer() {
     webgazer.end();
     showStatus('Остановлено');
+    clearCalibrationDots();
     isReady = false;
     document.getElementById("start").disabled = false;
     document.getElementById("pause").disabled = true;
@@ -85,5 +89,13 @@ function showVideo() {
 }
 
 window.onbeforeunload = function() {
-    webgazer.end();
+    endWebGazer();
+}
+
+function waitFor(conditionCheck) {
+    let poll = (resolve) => {
+        if (conditionCheck()) resolve();
+        else setTimeout(() => poll(resolve), 200);
+    };
+    return new Promise(poll);
 }
