@@ -36,7 +36,7 @@ function Level(duration = 5.0, imageAreas = [], captureAreas = []) {
 
 var levels = [
     new Level(
-        5.0,
+        7.5,
         [
             new ImageArea('cago/1/край.jpeg', 100, 100, 400, 900),
             new ImageArea('cago/2/dva-muzhchiny-smotryat-drug-na-druga.jpg', 500, 100, 1000, 900),
@@ -47,7 +47,7 @@ var levels = [
         ],
     ),
     new Level(
-        5.0,
+        7.5,
         [
             new ImageArea('cago/1/край.jpeg', 100, 100, 1000, 300),
             new ImageArea('cago/2/dva-muzhchiny-smotryat-drug-na-druga.jpg', 100, 400, 1000, 900),
