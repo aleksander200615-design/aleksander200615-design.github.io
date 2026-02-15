@@ -15,6 +15,11 @@
             border: solid 2px black;
             background-color: skyblue;
             position: fixed;
+            opacity: 30%;
+        }
+        img.image-area {
+            object-fit: fill;
+            position: fixed;
         }
         .calibration-dot {
             width: 16px;
@@ -23,6 +28,7 @@
             background-color: rgb(255, 70, 70);
             border-radius: 100vmax;
             position: absolute;
+            z-index: 10000;
         }
         #calibration-area {
             position: relative;
@@ -45,10 +51,11 @@
         </div>
         <button id="reset" onclick="resetWebGazer()">Сбросить</button>
     </div>
-    <div class="capture-area" id="ca0" style="left: 500px; top: 200px; width: 150px; height: 150px">0</div>
     <div id="calibration-area"></div>
     <script src="calibration.js"></script>
     <script src="capture-areas.js"></script>
+    <script src="image-areas.js"></script>
+    <script src="levels.js"></script>
     <script src="main.js"></script>
 </body>
 </html>

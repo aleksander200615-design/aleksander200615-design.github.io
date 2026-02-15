@@ -29,8 +29,9 @@ function startWebGazer() {
         document.getElementById("hide").disabled = false;
         document.getElementById("show").disabled = true;
         document.getElementById("end").disabled = false;
-        initCaptureAreas();
-        initializeCalibrationDots();
+        initializeCalibrationDots(()=>{
+            runLevel(0);
+        });
     });
 }
 
@@ -73,7 +74,7 @@ function handleWebGazerCoordinates(data, timestamp) {
     let x = data.x;
     let y = data.y;
     //console.log(`Взгляд: x=${Math.round(x)}, y=${Math.round(y)}, время=${timestamp}`);
-    checkCaptureAreas(x, y, timeDelta);
+    if (currentLevel !== null) checkCaptureAreas(x, y, timeDelta, currentLevel.captureAreas);
 }
 
 function hideVideo() {

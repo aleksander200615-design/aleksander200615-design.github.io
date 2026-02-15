@@ -5,7 +5,7 @@ function CalibrationDot()
 
 var caldots = {}
 
-function initializeCalibrationDots() {
+function initializeCalibrationDots(callbackAfterCalibrationComplete) {
     let area = document.getElementById('calibration-area');
     clearCalibrationDots();
     for (let x of [0.0, 0.5, 1.0]) {
@@ -28,6 +28,12 @@ function initializeCalibrationDots() {
                 {
                     calibrationDot.remove();
                     delete caldots[calibrationDot.id];
+                    let caldotsLeft = 0;
+                    for (let key in caldots) caldotsLeft++;
+                    console.log('Calibration dots left: '+caldotsLeft);
+                    if (caldotsLeft === 0) {
+                        callbackAfterCalibrationComplete();
+                    }
                 }
             };
         }
