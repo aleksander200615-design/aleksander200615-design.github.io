@@ -1,9 +1,10 @@
 function CaptureArea(name, x0, y0, x1, y1) {
+    let ca = document.getElementById('calibration-area');
     this.timeCounter = 0;
-    this.x0 = x0;
-    this.y0 = y0;
-    this.x1 = x1;
-    this.y1 = y1;
+    this.x0 = ca.offsetLeft + ca.clientWidth * x0;
+    this.y0 = ca.offsetTop + ca.clientHeight * y0;
+    this.x1 = ca.offsetLeft + ca.clientWidth * x1;
+    this.y1 = ca.offsetTop + ca.clientHeight * y1;
     this.name = name;
 }
 
