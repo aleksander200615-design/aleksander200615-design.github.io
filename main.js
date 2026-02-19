@@ -30,7 +30,19 @@ function startWebGazer() {
         document.getElementById("show").disabled = true;
         document.getElementById("end").disabled = false;
         initializeCalibrationDots(()=>{
-            runLevel(0);
+            runLevel(0, ()=>{
+                let content = 'levelname\tcaptureareaname\ttime\n';
+                for (let level of levels) {
+                    for (let ca of level.captureAreas) {
+                        content += `${level.name}\t${ca.name}\t${ca.timeCounter.toString().replace('.', ',')}\n`;
+                    }
+                }
+                let downloadButton = document.createElement('a');
+                downloadButton.innerText = "Скачать результаты";
+                document.getElementById('calibration-area').appendChild(downloadButton);
+                downloadButton.setAttribute('href', 'data:text/plain;charset=utf-8,' + encodeURIComponent(content));
+                downloadButton.setAttribute('download', `results[${new Date()}].csv`);
+            });
         });
     });
 }

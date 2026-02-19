@@ -158,16 +158,17 @@ var levels = [
 
 var currentLevel = null;
 
-function runLevel(index = 0) {
+function runLevel(index = 0, callbackAfterAllLevels = ()=>{}) {
     if (index === levels.length) {
         currentLevel = null;
+        callbackAfterAllLevels();
     }
     else {
         levels[index].init();
         currentLevel = levels[index];
         setTimeout(()=>{
             levels[index].clear();
-            runLevel(index+1);
+            runLevel(index+1, callbackAfterAllLevels);
         }, levels[index].duration * 1000);
     }
 }
