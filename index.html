@@ -35,6 +35,44 @@
             width: 100%;
             height: 100%;
         }
+        .notification-bg {
+            position: fixed;
+            left: 0;
+            top: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 100vw;
+            height: 100vh;
+            background-color: rgba(0,0,0,0.4);
+            padding: 16px;
+        }
+        .notification-panel {
+            padding: 30px;
+            background-color: white;
+            border-radius: 16px;
+            border: solid 2px black;
+            width: 100%;
+            height: 100%;
+            max-width: 50em;
+            max-height: 30em;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        .notification-panel .outer-frame {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            overflow-y: auto;
+        }
+        .notification-panel .outer-frame .inner-frame {
+            position: absolute;
+            width: 100%;
+            left: 0;
+            top: 0;
+            text-align: left;
+        }
     </style>
 </head>
 <body style="margin: 0; padding: 0;">
@@ -49,7 +87,8 @@
             <button id="hide" onclick="hideVideo()" disabled>Спрятать видео</button>
             <button id="show" onclick="showVideo()" disabled>Показать видео</button>
         </div>
-        <button id="reset" onclick="resetWebGazer()">Сбросить</button>
+        <button id="reset" onclick="resetWebGazer()" style="display: none" disabled>Сбросить</button>
+        <button id="consent" onclick="createNotificationConsent();">Согласие</button>
     </div>
     <div id="calibration-area"></div>
     <script src="calibration.js"></script>
@@ -57,5 +96,6 @@
     <script src="image-areas.js"></script>
     <script src="levels.js"></script>
     <script src="main.js"></script>
+    <script src="notifications.js"></script>
 </body>
 </html>

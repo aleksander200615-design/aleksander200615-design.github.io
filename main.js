@@ -7,6 +7,10 @@ function showStatus(msg) {
 }
 
 function startWebGazer() {
+    if (!window.confirm('Используя наше приложение, вы соглашаетесь на обработку персональных данных.\n'
+        +'Нажмите ОК, чтобы начать использовать наше приложение.\n'
+        +'Нажмите Отмена, чтобы вернуться в меню.\n'
+        +'Чтобы просмотреть согласие, нажмите на кнопку "Согласие" в меню.')) return;
     showStatus('Запуск... Разреши доступ к камере и кликай для калибровки');
     webgazer
         .setRegression('ridge')
@@ -24,6 +28,7 @@ function startWebGazer() {
             console.error(err);
         });
     document.getElementById("start").disabled = true;
+    document.getElementById("consent").disabled = true;
     waitFor(webgazer.isReady).then(()=>{
         document.getElementById("pause").disabled = false;
         document.getElementById("hide").disabled = false;
@@ -67,6 +72,7 @@ function endWebGazer() {
     clearCalibrationDots();
     isReady = false;
     document.getElementById("start").disabled = false;
+    document.getElementById("consent").disabled = false;
     document.getElementById("pause").disabled = true;
     document.getElementById("hide").disabled = true;
     document.getElementById("show").disabled = true;
